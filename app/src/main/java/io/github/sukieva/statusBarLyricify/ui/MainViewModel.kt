@@ -1,8 +1,9 @@
-package io.github.sukieva.statusBarLyricify
+package io.github.sukieva.statusBarLyricify.ui
 
 import StatusBarLyric.API.StatusBarLyric
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import io.github.sukieva.statusBarLyricify.MyApp
 
 
 class MainViewModel : ViewModel() {

@@ -1,4 +1,4 @@
-package io.github.sukieva.statusBarLyricify
+package io.github.sukieva.statusBarLyricify.ui
 
 import StatusBarLyric.API.StatusBarLyric
 import android.content.Intent
@@ -18,10 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.sukieva.statusBarLyricify.MyApp
 import io.github.sukieva.statusBarLyricify.service.MusicListenerService
 import io.github.sukieva.statusBarLyricify.ui.theme.StatusBarLyricifyTheme
 import io.github.sukieva.statusBarLyricify.utils.toast
-import java.security.AccessController.getContext
 
 @ExperimentalMaterial3Api
 class MainActivity : ComponentActivity() {
@@ -37,6 +37,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        val intent = Intent(this, MusicListenerService::class.java)
+        startService(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val intent = Intent(this, MusicListenerService::class.java)
+        startService(intent)
+    }
+
+    override fun onRestart() {
+        super.onRestart()
         val intent = Intent(this, MusicListenerService::class.java)
         startService(intent)
     }
