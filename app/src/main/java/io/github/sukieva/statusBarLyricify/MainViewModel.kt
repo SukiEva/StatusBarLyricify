@@ -1,9 +1,21 @@
 package io.github.sukieva.statusBarLyricify
 
-import androidx.lifecycle.ViewModel
 import StatusBarLyric.API.StatusBarLyric
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
 
 
 class MainViewModel : ViewModel() {
-    var statusBarLyric: StatusBarLyric? = null
+    val statusBarLyric = StatusBarLyric(
+        MyApp.context, null,
+        "io.github.sukieva.statusBarLyricify.MusicListenerService",
+        false
+    )
+    var isLyricEnabled = mutableStateOf(false)
+
+
+    fun checkLyricEnabled() {
+        isLyricEnabled.value = statusBarLyric.hasEnable()
+    }
+
 }

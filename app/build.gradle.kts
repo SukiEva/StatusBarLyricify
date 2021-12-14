@@ -48,11 +48,14 @@ android {
 dependencies {
     val composeVersion = "1.0.5"
     val accompanistVersion = "0.21.4-beta"
+    val lifecycleVersion = "2.4.0"
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.appcompat:appcompat:1.4.0")
     implementation("androidx.activity:activity-compose:1.4.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
     implementation("com.google.android.material:material:1.4.0")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
 
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.material:material:$composeVersion")
@@ -64,7 +67,8 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
     implementation("com.github.577fkj:StatusBarApiExample:v2.0")
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("cn.zhaiyifan:lyricview:1.0.1")
+
 
 
 }

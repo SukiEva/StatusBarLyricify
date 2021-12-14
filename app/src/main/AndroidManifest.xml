@@ -3,6 +3,7 @@
     package="io.github.sukieva.statusBarLyricify">
 
     <application
+        android:name=".MyApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -14,17 +15,10 @@
             android:name="XStatusBarLyric"
             android:value="true" />
 
-        <receiver
-            android:name=".receiver.SpotifyReceiver"
+        <service
+            android:name=".service.MusicListenerService"
             android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.spotify.music.playbackstatechanged" />
-                <action android:name="com.spotify.music.metadatachanged" />
-                <action android:name="com.spotify.music.queuechanged" />
-            </intent-filter>
-        </receiver>
-
+            android:exported="false" />
 
         <activity
             android:name=".MainActivity"
