@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">StatusBarLyricify</string>
+
+    <string name="active_not">未激活</string>
+    <string name="active_yes">已激活</string>
+
+    <string name="dialog_title">提示</string>
+    <string name="dialog_body">请在 Lsposed 和状态栏歌词中勾选本应用\n\n并且打开 Spotify 设置中的设备广播状态</string>
+    <string name="dialog_button">确认</string>
+</resources>

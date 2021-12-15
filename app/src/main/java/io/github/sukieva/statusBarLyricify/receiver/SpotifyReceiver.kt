@@ -34,7 +34,7 @@ class SpotifyReceiver : BroadcastReceiver() {
                 val trackName = intent.getStringExtra("track") ?: ""
                 val trackLengthInSec = intent.getIntExtra("length", 0).toLong()
                 val data = Media(trackName, artistName, albumName, trackLengthInSec)
-                Lyricify.setLrc(data)
+                //Lyricify.setLrc(data)
             }
             BroadcastTypes.PLAYBACK_STATE_CHANGED -> {
                 LogUtil.d(TAG, "PLAYBACK_STATE_CHANGED")

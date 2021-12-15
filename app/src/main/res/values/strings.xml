@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">StatusBarLyricify</string>
+
+    <string name="active_not">Not Active</string>
+    <string name="active_yes">Already Active</string>
+
+    <string name="dialog_title">Tips</string>
+    <string name="dialog_body">Please check the app in Lsposed and StatusBarLyrics\n\nAnd turn on device broadcast status in Spotify Settings</string>
+    <string name="dialog_button">Confirm</string>
 </resources>
