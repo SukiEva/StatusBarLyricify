@@ -7,4 +7,11 @@
     <string name="dialog_title">提示</string>
     <string name="dialog_body">请在 Lsposed 和状态栏歌词中勾选本应用\n\n并且打开 Spotify 设置中的设备广播状态</string>
     <string name="dialog_button">确认</string>
+
+    <string name="description">说明</string>
+    <string name="about">关于</string>
+    <string name="keep_alive">保活说明</string>
+    <string name="notice">注意事项</string>
+    <string name="dialog_keep_alive">请打开自启动和电池不优化权限</string>
+    <string name="dialog_error">一闪而过说明没找到歌词</string>
 </resources>

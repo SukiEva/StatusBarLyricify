@@ -21,7 +21,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
@@ -67,8 +68,9 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
     implementation("com.github.577fkj:StatusBarApiExample:v2.0")
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    //implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("cn.zhaiyifan:lyricview:1.0.1")
+    implementation("com.github.stuxuhai:jpinyin:1.1.8")
 
 
 

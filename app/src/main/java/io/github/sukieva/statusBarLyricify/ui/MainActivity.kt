@@ -1,6 +1,5 @@
 package io.github.sukieva.statusBarLyricify.ui
 
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,23 +8,19 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ListItem
-import androidx.compose.material.Switch
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.sukieva.statusBarLyricify.BuildConfig
 import io.github.sukieva.statusBarLyricify.R
-import io.github.sukieva.statusBarLyricify.service.MusicListenerService
 import io.github.sukieva.statusBarLyricify.ui.theme.StatusBarLyricifyTheme
 import io.github.sukieva.statusBarLyricify.utils.browse
+import io.github.sukieva.statusBarLyricify.utils.startServe
+import io.github.sukieva.statusBarLyricify.utils.stopServe
 
 @ExperimentalMaterial3Api
 class MainActivity : ComponentActivity() {
@@ -40,18 +35,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        startServe()
     }
 
-
-    fun startLyric() {
-        val intent = Intent(this, MusicListenerService::class.java)
-        startService(intent)
+    override fun onDestroy() {
+        super.onDestroy()
+        stopServe()
     }
 
-    fun stopLyric() {
-        val intent = Intent(this, MusicListenerService::class.java)
-        stopService(intent)
-    }
 }
 
 @ExperimentalMaterial3Api
@@ -67,10 +58,23 @@ fun MainView(model: MainViewModel = viewModel()) {
                 MyCard(
                     title = if (isLyricEnabled.value) stringResource(id = R.string.active_yes) else stringResource(id = R.string.active_not),
                     isActive = isLyricEnabled.value,
-                    onClick = { openDialog.value = true }
+                    onClick = {
+                        model.dialogId = 1
+                        openDialog.value = true
+                    }
                 )
                 Column(Modifier.padding(all = 30.dp)) {
-                    MyTitle("关于")
+                    MyTitle(stringResource(id = R.string.description))
+                    MyBody(stringResource(id = R.string.keep_alive), onClick = {
+                        model.dialogId = 2
+                        openDialog.value = true
+                    })
+                    MyBody(stringResource(id = R.string.notice), onClick = {
+                        model.dialogId = 3
+                        openDialog.value = true
+                    })
+                    Spacer(modifier = Modifier.height(20.dp))
+                    MyTitle(stringResource(id = R.string.about))
                     MyBody(title = "StatusBarLyricify", onClick = { browse("https://github.com/SukiEva/StatusBarLyricify") })
                     MyBody(title = "MIUIStatusBarLyric", onClick = { browse("https://github.com/577fkj/MIUIStatusBarLyric") })
                     MyBody(title = "StatusBarLyricExt", onClick = { browse("https://github.com/577fkj/StatusBarLyricExt") })
@@ -88,7 +92,13 @@ fun MainView(model: MainViewModel = viewModel()) {
                 Text(text = stringResource(id = R.string.dialog_title))
             },
             text = {
-                Text(text = stringResource(id = R.string.dialog_body))
+                val msg = when (model.dialogId) {
+                    1 -> stringResource(id = R.string.dialog_body)
+                    2 -> stringResource(id = R.string.dialog_keep_alive)
+                    3 -> stringResource(id = R.string.dialog_error)
+                    else -> ""
+                }
+                Text(text = msg)
             },
             confirmButton = {
                 TextButton(

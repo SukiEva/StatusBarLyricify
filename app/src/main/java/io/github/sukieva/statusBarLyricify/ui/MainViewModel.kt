@@ -7,13 +7,13 @@ import io.github.sukieva.statusBarLyricify.MyApp
 
 
 class MainViewModel : ViewModel() {
-    val statusBarLyric = StatusBarLyric(
+    private val statusBarLyric = StatusBarLyric(
         MyApp.context, null,
         "io.github.sukieva.statusBarLyricify.MusicListenerService",
         false
     )
     var isLyricEnabled = mutableStateOf(false)
-
+    var dialogId = 1
 
     fun checkLyricEnabled() {
         isLyricEnabled.value = statusBarLyric.hasEnable()

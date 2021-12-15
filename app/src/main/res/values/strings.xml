@@ -7,4 +7,11 @@
     <string name="dialog_title">Tips</string>
     <string name="dialog_body">Please check the app in Lsposed and StatusBarLyrics\n\nAnd turn on device broadcast status in Spotify Settings</string>
     <string name="dialog_button">Confirm</string>
+
+    <string name="description">Description</string>
+    <string name="about">About</string>
+    <string name="keep_alive">Keep Alive</string>
+    <string name="notice">Notice</string>
+    <string name="dialog_keep_alive">Please enable automatic startup and background running permissions</string>
+    <string name="dialog_error">A flash means no lyrics</string>
 </resources>

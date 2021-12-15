@@ -6,6 +6,7 @@ import android.content.Intent
 import io.github.sukieva.statusBarLyricify.data.Media
 import io.github.sukieva.statusBarLyricify.utils.LogUtil
 import io.github.sukieva.statusBarLyricify.utils.Lyricify
+import io.github.sukieva.statusBarLyricify.utils.toChinese
 
 
 /* API Document
@@ -24,28 +25,30 @@ class SpotifyReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val timeSentInMs = intent.getLongExtra("timeSent", 0L)
-        //Lyricify.updatePosition(positionInMs)
+        Lyricify.timeSentInMs = timeSentInMs
         when (intent.action) {
             BroadcastTypes.METADATA_CHANGED -> {
                 LogUtil.d(TAG, "METADATA_CHANGED")
-                //val trackId = intent.getStringExtra("id") ?: ""
                 val artistName = intent.getStringExtra("artist") ?: ""
                 val albumName = intent.getStringExtra("album") ?: ""
                 val trackName = intent.getStringExtra("track") ?: ""
                 val trackLengthInSec = intent.getIntExtra("length", 0).toLong()
-                val data = Media(trackName, artistName, albumName, trackLengthInSec)
-                //Lyricify.setLrc(data)
+                if (trackName == "") return
+                Lyricify.sendLyric(trackName)
+                Lyricify.requiredLrcTitle = trackName.toChinese()
+                Lyricify.setLrc(Media(trackName, artistName, albumName, trackLengthInSec).toChinese())
             }
             BroadcastTypes.PLAYBACK_STATE_CHANGED -> {
                 LogUtil.d(TAG, "PLAYBACK_STATE_CHANGED")
                 val isPlaying = intent.getBooleanExtra("playing", false)
                 val positionInMs = intent.getIntExtra("playbackPosition", 0)
-                Lyricify.updatePosition(positionInMs.toLong())
+                Lyricify.isPlaying = isPlaying
+                Lyricify.position = positionInMs.toLong()
                 if (isPlaying) Lyricify.startLyric()
                 else Lyricify.stopLyric()
             }
             BroadcastTypes.QUEUE_CHANGED -> {
-                LogUtil.d(TAG, "QUEUE_CHANGED")
+                //LogUtil.d(TAG, "QUEUE_CHANGED")
             }
         }
     }

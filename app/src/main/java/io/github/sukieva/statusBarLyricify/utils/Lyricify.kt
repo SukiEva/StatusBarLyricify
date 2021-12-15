@@ -2,78 +2,108 @@ package io.github.sukieva.statusBarLyricify.utils
 
 import StatusBarLyric.API.StatusBarLyric
 import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.text.TextUtils
 import cn.zhaiyifan.lyric.LyricUtils
 import cn.zhaiyifan.lyric.model.Lyric
 import io.github.sukieva.statusBarLyricify.MyApp
 import io.github.sukieva.statusBarLyricify.data.Media
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 object Lyricify {
-
+    private const val MSG_LYRIC_UPDATE_DONE = 2
     private const val SERVICE_NAME = "io.github.sukieva.statusBarLyricify.service.MusicListenerService"
     private const val TAG = "Lyricify"
-    private val job = Job()
-    private val scope = CoroutineScope(job)
-    private var lastSentenceFromTime: Long = -1
-    private var position: Long = 0
-    private var lyric: Lyric? = null
+
+    private var mLastSentenceFromTime: Long = -1
+    private var mLyric: Lyric? = null
+
+    var requiredLrcTitle: String? = null
+    var isPlaying: Boolean = false
+    var position: Long = 0
+    var timeSentInMs: Long = 0
+
+    @SuppressLint("StaticFieldLeak")
+    private val statusBarLyric = StatusBarLyric(MyApp.context, null, SERVICE_NAME, false)
 
     fun startLyric() {
-        LogUtil.d(TAG, " ==> Start!...")
-        println("Update lyric...")
-        //scope.launch {
-            val startTime = System.currentTimeMillis()
-            val tmpPosition = position
-            while (true) {
-                position = tmpPosition + System.currentTimeMillis() - startTime
-                if (!updateLyric()) break
-            }
-        //}
+        LogUtil.d(TAG, " ==> Start lyric...")
+        mLastSentenceFromTime = -1
+        mHandler.post(mLyricUpdateRunnable)
     }
 
     fun stopLyric() {
-        job.cancel()
-        StatusBarLyric(MyApp.context, null, SERVICE_NAME, false).stopLyric()
         LogUtil.d(TAG, " ==> Stop lyric...")
+        mHandler.removeCallbacks(mLyricUpdateRunnable)
+        //StatusBarLyric(MyApp.context, null, SERVICE_NAME, false).stopLyric()
+        statusBarLyric.stopLyric()
     }
 
-    private fun updateLyric(): Boolean {
-        LogUtil.d(TAG, " ==> Update lyric...")
-        if (lyric == null) {
-            LogUtil.d(TAG, " ==> lyric is null...")
-            return false
-        }
-        val sentence = LyricUtils.getSentence(lyric, position)
-        if (sentence == null) {
-            LogUtil.d(TAG, " ==> sentence is null...")
-            return false
-        }
-        LogUtil.d(TAG, " ==> yeah here...")
-        if (sentence.fromTime != lastSentenceFromTime) {
+    fun sendLyric(msg: String) {
+        statusBarLyric.updateLyric(msg)
+    }
+
+    private fun updateLyric(pos: Long) {
+        //LogUtil.d(TAG, " ==> Update lyric...")
+        if (mLyric == null) return
+        val sentence = LyricUtils.getSentence(mLyric, pos) ?: return
+        if (sentence.fromTime != mLastSentenceFromTime) {
             if (!TextUtils.isEmpty(sentence.content)) {
-                StatusBarLyric(MyApp.context, null, SERVICE_NAME, false)
-                    .updateLyric(sentence.content.replace("&apos;", "'"))
+                statusBarLyric.updateLyric(sentence.content.replace("&apos;", "'"))
             }
-            lastSentenceFromTime = sentence.fromTime
+            mLastSentenceFromTime = sentence.fromTime
         }
-        return true
     }
 
     fun setLrc(data: Media) {
-        scope.launch {
-            lyric = LrcGetter.getLyric(MyApp.context, data)
-            LogUtil.d(TAG, " ==> Try to get lyric...")
+        LrcUpdateThread(mHandler, data).start()
+    }
+
+
+    private val mHandler: Handler = object : Handler(Looper.myLooper()!!) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            if (msg.what == MSG_LYRIC_UPDATE_DONE && msg.data.getString("title", "") == requiredLrcTitle) {
+                mLyric = if (msg.obj == null) {
+                    null
+                } else {
+                    msg.obj as Lyric
+                }
+                if (mLyric == null) {
+                    sendLyric("未找到歌词")
+                    stopLyric()
+                }
+            }
         }
     }
 
-    fun updatePosition(p: Long) {
-        position = p
-        LogUtil.d(TAG, " ==> Update lyric position...")
+    private val mLyricUpdateRunnable: Runnable = object : Runnable {
+        override fun run() {
+            if (!isPlaying) {
+                stopLyric()
+                return
+            }
+            updateLyric(position + System.currentTimeMillis() - timeSentInMs)
+            mHandler.postDelayed(this, 250)
+        }
     }
 
+    private class LrcUpdateThread(private val handler: Handler?, private val data: Media) : Thread() {
+        private val context: Context = MyApp.context
+        override fun run() {
+            if (handler == null) return
+            val lrc = LrcGetter.getLyric(context, data)
+            val message = Message()
+            message.what = MSG_LYRIC_UPDATE_DONE
+            message.obj = lrc
+            val bundle = Bundle()
+            bundle.putString("title", data.title)
+            message.data = bundle
+            handler.sendMessage(message)
+        }
+    }
 }
